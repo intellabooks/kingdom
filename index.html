@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kingdom Dashboard — Alicia Martin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #FF85A2;
+    --cyan: #00D9FF;
+    --orchid: #C3A5EC;
+    --blush: #FFF0F3;
+    --deep: #011f38;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --text: #FFF0F3;
+    --muted: rgba(255,240,243,0.5);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--deep);color:var(--text);font-family:var(--sans);font-weight:300;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 0%,rgba(0,217,255,0.06) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 80% 100%,rgba(255,133,162,0.08) 0%,transparent 60%);pointer-events:none;z-index:0;}
+  .container{max-width:1100px;margin:0 auto;padding:0 20px 80px;position:relative;z-index:1;}
+  header{padding:48px 0 32px;text-align:center;border-bottom:0.5px solid var(--border);margin-bottom:40px;}
+  .logo-ring{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;border:1.5px solid var(--pink);margin-bottom:16px;font-family:var(--serif);font-size:20px;font-weight:600;color:var(--pink);}
+  header h1{font-family:var(--serif);font-size:clamp(28px,5vw,44px);font-weight:300;font-style:italic;color:var(--blush);letter-spacing:-0.5px;line-height:1.1;}
+  header h1 span{color:var(--pink);font-style:normal;}
+  .tagline{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:8px;}
+  .date-bar{display:flex;align-items:center;justify-content:center;gap:24px;padding:12px 0;font-size:13px;color:var(--muted);margin-bottom:40px;flex-wrap:wrap;}
+  .date-bar .dn{font-family:var(--serif);font-size:18px;color:var(--cyan);font-style:italic;}
+  .sep{opacity:0.3;}
+  .live-dot{display:inline-block;width:7px;height:7px;background:var(--cyan);border-radius:50%;margin-right:6px;animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+
+  /* COUNTDOWN */
+  .cd-hero{background:var(--card);border:0.5px solid var(--border);border-radius:20px;padding:36px 32px;margin-bottom:28px;position:relative;overflow:hidden;}
+  .cd-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--pink),var(--orchid),transparent);}
+  .cd-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+  .cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+  @media(max-width:400px){.cd-grid{grid-template-columns:repeat(2,1fr);}}
+  .cd-unit{text-align:center;background:rgba(255,133,162,0.06);border:0.5px solid rgba(255,133,162,0.15);border-radius:12px;padding:16px 8px;}
+  .cd-num{font-family:var(--serif);font-size:clamp(28px,6vw,48px);font-weight:300;color:var(--pink);line-height:1;display:block;}
+  .cd-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:4px;display:block;}
+  .prog-wrap{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted);}
+  .prog-bar{flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;}
+  .prog-fill{height:100%;background:linear-gradient(90deg,var(--pink),var(--orchid));border-radius:2px;transition:width 1s ease;}
+
+  /* TABS */
+  .tab-nav{display:flex;gap:4px;background:rgba(255,255,255,0.03);border:0.5px solid var(--border);border-radius:12px;padding:4px;margin-bottom:28px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .tab-nav::-webkit-scrollbar{display:none;}
+  .tab-btn{flex-shrink:0;padding:8px 16px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:var(--sans);font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;}
+  .tab-btn.active{background:rgba(255,133,162,0.15);color:var(--pink);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  /* SECTION */
+  .sec-hdr{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;padding-bottom:8px;border-bottom:0.5px solid var(--border);}
+  .sec-hdr h2{font-family:var(--serif);font-size:22px;font-weight:300;font-style:italic;color:var(--blush);}
+  .badge{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);border:0.5px solid rgba(0,217,255,0.3);padding:2px 8px;border-radius:20px;}
+  .card{background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:24px;}
+
+  /* WEEK GRID */
+  .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px;}
+  @media(max-width:700px){.week-grid{grid-template-columns:repeat(4,1fr);}}
+  @media(max-width:420px){.week-grid{grid-template-columns:repeat(2,1fr);}}
+  .day-card{border-radius:14px;padding:14px 10px;cursor:pointer;transition:transform .15s;border:1px solid transparent;}
+  .day-card:hover{transform:translateY(-2px);}
+  .day-card.active{border-color:rgba(255,255,255,0.3)!important;}
+  .day-card.mon{background:rgba(0,100,200,0.15);border-color:rgba(0,150,255,0.2);}
+  .day-card.tue{background:rgba(30,140,60,0.15);border-color:rgba(30,200,80,0.2);}
+  .day-card.wed{background:rgba(255,133,162,0.1);border-color:rgba(255,133,162,0.2);}
+  .day-card.thu{background:rgba(140,80,220,0.15);border-color:rgba(195,165,236,0.2);}
+  .day-card.fri{background:rgba(60,60,80,0.2);border-color:rgba(150,150,180,0.2);}
+  .day-card.sat{background:rgba(200,160,0,0.1);border-color:rgba(255,200,0,0.2);}
+  .day-card.sun{background:rgba(255,230,200,0.08);border-color:rgba(255,200,150,0.2);}
+  .day-dot{width:8px;height:8px;border-radius:50%;margin-bottom:8px;}
+  .day-abbr{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+  .day-name-c{font-family:var(--serif);font-size:13px;margin-bottom:5px;line-height:1.2;}
+  .day-theme{font-size:10px;color:var(--muted);line-height:1.4;}
+  .day-wake{font-size:11px;margin-top:6px;color:var(--cyan);}
+
+  /* DAY DETAIL */
+  .day-detail{display:none;background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:28px;margin-bottom:28px;animation:fadeIn .2s ease;}
+  .day-detail.visible{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .det-hdr{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+  .det-bar{width:4px;height:40px;border-radius:2px;flex-shrink:0;}
+  .det-title{font-family:var(--serif);font-size:26px;font-weight:300;font-style:italic;}
+  .det-sub{font-size:12px;color:var(--muted);letter-spacing:1px;}
+  .scripture{background:rgba(195,165,236,0.08);border-left:2px solid var(--orchid);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px;font-family:var(--serif);font-style:italic;font-size:14px;color:var(--orchid);line-height:1.6;}
+  .day-why{font-size:13px;color:var(--muted);margin-bottom:20px;font-style:italic;line-height:1.6;}
+  .tl-item{display:grid;grid-template-columns:76px 1fr;gap:16px;padding:10px 0;border-bottom:0.5px solid var(--border);align-items:start;}
+  .tl-item:last-child{border-bottom:none;}
+  .tl-time{font-size:12px;color:var(--cyan);padding-top:2px;font-variant-numeric:tabular-nums;}
+  .tl-title{font-size:14px;color:var(--blush);margin-bottom:2px;}
+  .tl-sub{font-size:12px;color:var(--muted);line-height:1.5;}
+  .tl-tag{display:inline-block;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:middle;}
+  .t-spirit{background:rgba(195,165,236,0.2);color:var(--orchid);}
+  .t-body{background:rgba(0,217,255,0.1);color:var(--cyan);}
+  .t-work{background:rgba(255,133,162,0.1);color:var(--pink);}
+  .t-biz{background:rgba(255,200,0,0.1);color:#ffc800;}
+  .t-life{background:rgba(255,255,255,0.06);color:var(--muted);}
+
+  /* LOG */
+  .log-controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .wk-nav{display:flex;align-items:center;gap:10px;}
+  .wk-btn{background:var(--card);border:0.5px solid var(--border);color:var(--text);padding:6px 14px;border-radius:8px;cursor:pointer;font-family:var(--sans);font-size:12px;transition:background .15s;}
+  .wk-btn:hover{background:rgba(255,255,255,0.08);}
+  .wk-label{font-family:var(--serif);font-size:16px;font-style:italic;color:var(--blush);}
+  .log-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px;}
+  @media(max-width:600px){.log-grid{grid-template-columns:repeat(4,1fr);}}
+  .log-day{border-radius:10px;padding:10px 8px;border:0.5px solid var(--border);background:var(--card);}
+  .log-dname{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  .log-chk{display:flex;align-items:flex-start;gap:6px;cursor:pointer;padding:3px 0;}
+  .lc-box{width:14px;height:14px;border-radius:3px;border:1px solid rgba(255,133,162,0.35);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;margin-top:1px;}
+  .log-chk.done .lc-box{background:var(--pink);border-color:var(--pink);}
+  .lc-lbl{font-size:10px;color:var(--muted);line-height:1.3;}
+  .log-chk.done .lc-lbl{color:var(--text);}
+  .wk-summary{background:rgba(255,133,162,0.05);border:0.5px solid rgba(255,133,162,0.15);border-radius:12px;padding:16px 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:center;}
+  @media(max-width:480px){.wk-summary{grid-template-columns:repeat(2,1fr);}}
+  .ws-num{font-family:var(--serif);font-size:28px;color:var(--pink);display:block;}
+  .ws-lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+
+  /* CHECKLIST */
+  .checklist{display:flex;flex-direction:column;gap:8px;}
+  .chk-item{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:rgba(255,255,255,0.02);border:0.5px solid var(--border);border-radius:10px;cursor:pointer;transition:background .15s;user-select:none;}
+  .chk-item:hover{background:rgba(255,255,255,0.04);}
+  .chk-item.done{opacity:.5;}
+  .chk-item.done .chk-label{text-decoration:line-through;}
+  .chk-box{width:18px;height:18px;border-radius:5px;border:1.5px solid rgba(255,133,162,0.4);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;margin-top:1px;}
+  .chk-item.done .chk-box{background:var(--pink);border-color:var(--pink);}
+  .chk-box svg{display:none;}
+  .chk-item.done .chk-box svg{display:block;}
+  .chk-label{font-size:13px;flex:1;line-height:1.5;}
+  .chk-meta{font-size:11px;color:var(--muted);display:block;margin-top:2px;}
+
+  /* NUTRITION */
+  .med-alert{background:rgba(195,165,236,0.08);border:0.5px solid rgba(195,165,236,0.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--orchid);line-height:1.7;}
+  .nut-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  @media(max-width:500px){.nut-grid{grid-template-columns:1fr;}}
+  .nut-item{background:rgba(255,255,255,0.02);border:0.5px solid var(--border);border-radius:10px;padding:14px;}
+  .nut-time{font-size:11px;color:var(--cyan);margin-bottom:3px;}
+  .nut-meal{font-size:14px;color:var(--blush);margin-bottom:4px;}
+  .nut-detail{font-size:12px;color:var(--muted);line-height:1.6;}
+  .nut-macros{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .macro{font-size:10px;padding:2px 7px;border-radius:10px;border:0.5px solid rgba(255,133,162,0.2);color:var(--pink);}
+
+  /* IB TASKS */
+  .wk-block{margin-bottom:12px;border:0.5px solid var(--border);border-radius:14px;overflow:hidden;}
+  .wk-block-hdr{background:rgba(255,133,162,0.06);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background .15s;}
+  .wk-block-hdr:hover{background:rgba(255,133,162,0.1);}
+  .wk-block-title{font-family:var(--serif);font-size:16px;font-style:italic;color:var(--blush);}
+  .wk-block-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+  .wk-block-body{padding:16px 18px;display:none;}
+  .wk-block-body.open{display:block;}
+  .task-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border);font-size:13px;cursor:pointer;}
+  .task-row:last-child{border-bottom:none;}
+  .task-row.done{opacity:.45;}
+  .task-row.done .task-txt{text-decoration:line-through;}
+  .task-chk{width:16px;height:16px;border-radius:4px;border:1px solid rgba(255,200,0,0.4);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+  .task-row.done .task-chk{background:#ffc800;border-color:#ffc800;}
+  .task-txt{flex:1;line-height:1.5;}
+  .task-tag{font-size:10px;color:var(--muted);margin-top:2px;}
+
+  /* MINISTRY */
+  .min-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+  @media(max-width:600px){.min-grid{grid-template-columns:repeat(2,1fr);}}
+  .min-card{background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;transition:border-color .15s;}
+  .min-card.done{border-color:rgba(0,217,255,0.4);}
+  .min-wk{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .min-title{font-size:12px;color:var(--blush);font-weight:400;line-height:1.4;}
+  .min-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+  .min-done{display:none;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);margin-top:6px;}
+  .min-card.done .min-done{display:block;}
+
+  /* GOD SPEAKS */
+  .god{background:rgba(195,165,236,0.06);border:0.5px solid rgba(195,165,236,0.2);border-radius:16px;padding:28px;margin-bottom:28px;position:relative;}
+  .god::before{content:'\201C';position:absolute;top:12px;left:20px;font-family:var(--serif);font-size:60px;color:rgba(195,165,236,0.15);line-height:1;}
+  .god-txt{font-family:var(--serif);font-size:clamp(15px,2.5vw,18px);font-style:italic;font-weight:300;line-height:1.8;color:var(--orchid);text-align:center;position:relative;z-index:1;}
+  .god-ref{text-align:center;margin-top:12px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(195,165,236,0.4);}
+
+  footer{text-align:center;padding:32px 0 0;border-top:0.5px solid var(--border);font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+  footer span{color:var(--pink);}
+  .mb20{margin-bottom:20px;}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="logo-ring">IB</div>
+  <h1>Kingdom <span>Dashboard</span></h1>
+  <p class="tagline">Alicia Martin · Intellabooks · By Grace, By Pattern</p>
+</header>
+
+<div class="date-bar">
+  <span class="live-dot"></span>
+  <span id="cur-date"></span>
+  <span class="sep">·</span>
+  <span class="dn" id="cur-day"></span>
+  <span class="sep">·</span>
+  <span id="cur-time"></span>
+</div>
+
+<div class="cd-hero">
+  <div class="cd-label">✦ Temple Transformation · 180 → 150 lbs · Goal: August 25, 2026 ✦</div>
+  <div class="cd-grid">
+    <div class="cd-unit"><span class="cd-num" id="cd-w">—</span><span class="cd-lbl">Weeks</span></div>
+    <div class="cd-unit"><span class="cd-num" id="cd-d">—</span><span class="cd-lbl">Days</span></div>
+    <div class="cd-unit"><span class="cd-num" id="cd-h">—</span><span class="cd-lbl">Hours</span></div>
+    <div class="cd-unit"><span class="cd-num" id="cd-m">—</span><span class="cd-lbl">Minutes</span></div>
+  </div>
+  <div class="prog-wrap">
+    <span style="font-size:11px">Start</span>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <span style="font-family:var(--serif);font-size:15px;color:var(--blush);white-space:nowrap">150 lbs · Aug 25</span>
+  </div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('mission',this)">✦ Mission</button>
+  <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
+  <button class="tab-btn" onclick="switchTab('tracker',this)">Weekly Log</button>
+  <button class="tab-btn" onclick="switchTab('morning',this)">Morning Ritual</button>
+  <button class="tab-btn" onclick="switchTab('winddown',this)">Evening Wrap</button>
+  <button class="tab-btn" onclick="switchTab('nutrition',this)">Nutrition</button>
+  <button class="tab-btn" onclick="switchTab('intellabooks',this)">Intellabooks</button>
+  <button class="tab-btn" onclick="switchTab('vision',this)">Vision</button>
+  <button class="tab-btn" onclick="switchTab('ministry',this)">Ministry</button>
+  <button class="tab-btn" onclick="switchTab('prayer',this)">Prayer</button>
+</div>
+
+<!-- SCHEDULE -->
+<div class="tab-panel" id="tab-schedule">
+  <div class="sec-hdr"><h2>Weekly Rhythm</h2><span class="badge">Tap a day</span></div>
+  <div class="week-grid" id="week-grid"></div>
+  <div class="day-detail" id="day-detail"></div>
+</div>
+
+<!-- WEEKLY LOG -->
+<div class="tab-panel" id="tab-tracker">
+  <div class="sec-hdr"><h2>Weekly Log</h2><span class="badge">Tracks Week Over Week</span></div>
+  <div class="log-controls">
+    <div class="wk-nav">
+      <button class="wk-btn" onclick="changeWeek(-1)">← Prev</button>
+      <span class="wk-label" id="wk-label">This Week</span>
+      <button class="wk-btn" onclick="changeWeek(1)">Next →</button>
+    </div>
+    <span style="font-size:12px;color:var(--muted)" id="wk-range"></span>
+  </div>
+  <div class="log-grid" id="log-grid"></div>
+  <div class="wk-summary" id="wk-summary"></div>
+</div>
+
+<!-- MORNING RITUAL -->
+<div class="tab-panel" id="tab-morning">
+  <div class="sec-hdr"><h2>Morning Ritual</h2><span class="badge">Step by Step · With the Why</span></div>
+  <div class="scripture" style="margin-bottom:20px;background:rgba(195,165,236,0.08);border-left:2px solid var(--orchid);padding:14px 18px;border-radius:0 10px 10px 0;font-family:var(--serif);font-style:italic;font-size:14px;color:var(--orchid);line-height:1.7">"In the morning, Lord, you hear my voice; in the morning I lay my requests before you and wait expectantly." — Psalm 5:3</div>
+
+  <div id="morning-steps"></div>
+
+  <div style="margin-top:20px;background:rgba(0,217,255,0.05);border:0.5px solid rgba(0,217,255,0.2);border-radius:12px;padding:18px 20px;">
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px">Shower Timing — Know Before You Go</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.8">
+      <strong style="color:var(--text)">Thursday only:</strong> Shower at EOS after weightlifting with Liz, before driving to Drybar.<br>
+      <strong style="color:var(--text)">All other gym days:</strong> Drive home first, shower at home in your own space.<br>
+      <strong style="color:var(--text)">After gym, at home:</strong> Shower → lotion → ribbed lounge set (green, pink, blue, or black) → you're dressed for the day.<br>
+      <strong style="color:var(--text)">Before bed:</strong> No second shower needed — skin care routine is enough unless you choose it.
+    </div>
+  </div>
+</div>
+
+<!-- EVENING WRAP -->
+<div class="tab-panel" id="tab-winddown">
+  <div class="sec-hdr"><h2>Evening Wrap</h2><span class="badge">8:15 PM · Every Night</span></div>
+  <div class="scripture" style="margin-bottom:20px;background:rgba(195,165,236,0.08);border-left:2px solid var(--orchid);padding:14px 18px;border-radius:0 10px 10px 0;font-family:var(--serif);font-style:italic;font-size:14px;color:var(--orchid);line-height:1.7">"In peace I will lie down and sleep, for you alone, Lord, make me dwell in safety." — Psalm 4:8</div>
+
+  <div id="evening-steps"></div>
+</div>
+
+<!-- NUTRITION -->
+<div class="tab-panel" id="tab-nutrition">
+  <div class="sec-hdr"><h2>Sacred Fueling</h2><span class="badge">16:8 · 11am–7pm</span></div>
+  <div class="med-alert">
+    💊 <strong>Lurasidone:</strong> Must be taken with a minimum 350-calorie meal. Your 6:30pm Medication Meal is non-negotiable. If appetite is low, the frozen shake (~380 cal, 40g protein) fully satisfies this requirement. Greek yogurt is a flexible swap for cottage cheese — same nutritional role, your preference in the moment.
+  </div>
+  <div class="card mb20">
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Daily target: <strong style="color:var(--pink)">1,450 cal · 130g protein</strong></p>
+    <div class="nut-grid" id="nut-grid"></div>
+  </div>
+  <div class="card">
+    <div class="sec-hdr" style="border:none;padding:0;margin-bottom:12px"><h2 style="font-size:18px">Weekly Grocery List</h2></div>
+    <div class="checklist" id="grocery-list"></div>
+  </div>
+</div>
+
+<!-- INTELLABOOKS -->
+<div class="tab-panel" id="tab-intellabooks">
+  <div class="sec-hdr"><h2>Build Phase</h2><span class="badge">Goal: 7 Clients</span></div>
+  <div class="god mb20">
+    <p class="god-txt">"Do you see a woman skillful in her work? She will stand before kings; she will not stand before obscure men."</p>
+    <p class="god-ref">Proverbs 22:29 · Your outreach strategy is anointed</p>
+  </div>
+  <div id="ib-tasks"></div>
+</div>
+
+<!-- MINISTRY -->
+<div class="tab-panel" id="tab-ministry">
+  <div class="sec-hdr"><h2>Acts of Grace</h2><span class="badge">Monthly Rhythm</span></div>
+  <div class="min-grid" id="min-grid"></div>
+  <div class="card">
+    <div class="sec-hdr" style="border:none;padding:0;margin-bottom:12px"><h2 style="font-size:18px">Blessing Bag Contents</h2></div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Keep 10 bags in your trunk. Wagyu-level generosity — always ready.</p>
+    <div class="checklist" id="blessing-list"></div>
+  </div>
+</div>
+
+<!-- MISSION -->
+<div class="tab-panel active" id="tab-mission">
+  <div id="mission-content"></div>
+</div>
+
+<!-- VISION -->
+<div class="tab-panel" id="tab-vision">
+  <div id="vision-content"></div>
+</div>
+
+<!-- PRAYER -->
+<div class="tab-panel" id="tab-prayer">
+  <div class="sec-hdr"><h2>Prayer of the Week</h2><span class="badge">Study · Reflection · Response</span></div>
+  <div id="prayer-content"></div>
+</div>
+
+<div class="god">
+  <p class="god-txt">"You are my Bezalel. I filled you with My Spirit to design systems that create space for others to breathe. Your Founder IQ is a gift from Me to settle the chaos of the world. Do not rush the build — the foundation is where My glory dwells. I am not just in your success; I am in your 4:15 AM breath."</p>
+  <p class="god-ref">Exodus 31 · A word for the season</p>
+</div>
+
+<footer><p>Intellabooks · <span>intellabooks.com</span> · Built by Grace, Scaled by Faith · 2026</p></footer>
+</div>
+
+<script>
+const DAYS=[
+  {key:'mon',abbr:'Mon',name:'The Day of Order',color:'#378ADD',theme:'Light & Clarity',outfit:'Blue',wake:'5:45am',
+   scripture:'"God saw that the light was good, and he separated the light from the darkness." — Genesis 1:4',
+   why:'Monday divides rest from work. You set vision, sync data, and wear Blue for the heavenly, high-level view.',
+   tl:[
+    {t:'5:45am',n:'Wake · Gratitude · Meds · Face · Hair',g:['spirit']},
+    {t:'6:00am',n:'Yoga 10m · Meditation 5m · Wim Hof 5m',g:['spirit','body']},
+    {t:'6:20am',n:'Bible Study & Prayer',g:['spirit']},
+    {t:'6:50am',n:'Dress in Blue · Drive to WRKT',g:['life'],s:'20 min drive each way'},
+    {t:'7:15am',n:'WRKT Pilates — 1 hour',g:['body']},
+    {t:'8:45am',n:'Drive home · Shower · Lounge set on',g:['life']},
+    {t:'10:30am',n:'Cottage Cheese + Omega-3 + D3 (break fast)',g:['body']},
+    {t:'11:00am',n:'Monks Vendor Sync — data alignment',g:['work']},
+    {t:'11:30am',n:'Boss Workshop with Nick',g:['work']},
+    {t:'2:30pm',n:'ELT Number Review',g:['work']},
+    {t:'4:30pm',n:'Dog Walk — prayer walk',g:['spirit','body']},
+    {t:'6:00pm',n:'Intellabooks: Outreach — 10 HVAC/Medspa emails',g:['biz']},
+    {t:'8:00pm',n:'Lurasidone Medication Meal — 200g Wagyu + Asparagus',g:['body'],s:'350 cal minimum — non-negotiable'},
+    {t:'8:15pm',n:'Wind-down Checklist',g:['life']},
+    {t:'9:15pm',n:'Lights out 🌙',g:['spirit']},
+   ]},
+  {key:'tue',abbr:'Tue',name:'The Day of Strength',color:'#3B6D11',theme:'Seed & Soil — intentionally hard',outfit:'Green',wake:'4:45am',
+   scripture:'"Let the land produce vegetation: seed-bearing plants and trees." — Genesis 1:11',
+   why:'Hardest day by design. Double workout = plowing the soil. Therapy = weeding the heart. Tuesday evening is sacred rest — no Intellabooks, ever.',
+   tl:[
+    {t:'4:45am',n:'Wake · Gratitude · Meds · Face',g:['spirit']},
+    {t:'5:00am',n:'Yoga · Meditation · Wim Hof',g:['spirit','body']},
+    {t:'5:15am',n:'WRKT Pilates — Camp Bowie location',g:['body'],s:'Green set · right next to EOS'},
+    {t:'6:30am',n:'Drive to EOS Fitness — Camp Bowie',g:['life']},
+    {t:'7:00am',n:'Weightlifting with trainer — 30 min',g:['body']},
+    {t:'7:45am',n:'Shower at EOS · Lounge set on · Protein Shake',g:['life','body']},
+    {t:'10:00am',n:'ELT Number Review',g:['work']},
+    {t:'11:00am',n:'Therapy — 1 hour',g:['spirit'],s:'Renewing of the mind · Romans 12:2'},
+    {t:'11:30am',n:'Break fast — Cottage Cheese or Greek Yogurt',g:['body']},
+    {t:'12:00pm',n:'Standup',g:['work']},
+    {t:'12:30pm',n:'1:1 with Nick',g:['work']},
+    {t:'1:00pm',n:'Marketing Leadership Meeting',g:['work']},
+    {t:'4:30pm',n:'Long Dog Walk — prayer time',g:['spirit','body']},
+    {t:'6:30pm',n:'Lurasidone Medication Meal — Wagyu or frozen shake',g:['body'],s:'350 cal minimum'},
+    {t:'7:30pm',n:'Child-like rest — coloring, reading. NO Intellabooks.',g:['spirit']},
+    {t:'9:15pm',n:'Lights out — early by design 🌙',g:['spirit']},
+   ]},
+  {key:'wed',abbr:'Wed',name:'The Day of Clarity',color:'#D4537E',theme:'Navigation & Light',outfit:'Pink / White',wake:'5:00am',
+   scripture:'"God made two great lights to govern the day and night. He also made the stars." — Genesis 1:16',
+   why:'Mid-week navigation day. Top of Funnel numbers = the stars guiding your business ship. Pink/White for compassion and clarity.',
+   tl:[
+    {t:'5:00am',n:'Wake · Gratitude · Meds · Face',g:['spirit']},
+    {t:'5:20am',n:'Yoga · Meditation · Wim Hof · Bible Study',g:['spirit','body']},
+    {t:'6:15am',n:'WRKT Pilates',g:['body']},
+    {t:'7:30am',n:'Shower · Dress in Pink or White',g:['life']},
+    {t:'9:00am',n:'Top of Funnel Numbers for ELT',g:['work']},
+    {t:'10:00am',n:'ELT Reporting Focus Block',g:['work']},
+    {t:'11:00am',n:'Monks Weekly Presentation to AC Leadership',g:['work']},
+    {t:'11:00am',n:'Break fast — Cottage Cheese or Greek Yogurt + Omega-3',g:['body']},
+    {t:'12:30pm',n:'Reporting Updates Buffer',g:['work']},
+    {t:'12:45pm',n:'1:1 with Nick · Office Hours open 12:45–1:15',g:['work']},
+    {t:'2:30pm',n:'Grocery run — Wagyu, asparagus, yogurt, bananas',g:['life']},
+    {t:'4:30pm',n:'Dog Walk · Sunset',g:['spirit','body']},
+    {t:'6:00pm',n:'Intellabooks: Content Scheduling / Social Batching',g:['biz'],s:'Meta + LinkedIn · post at analyzed ideal times'},
+    {t:'6:30pm',n:'Lurasidone Medication Meal',g:['body'],s:'350 cal minimum'},
+    {t:'8:15pm',n:'Wind-down',g:['life']},
+    {t:'9:15pm',n:'Lights out 🌙',g:['spirit']},
+   ]},
+  {key:'thu',abbr:'Thu',name:'The Day of Governance',color:'#7F77DD',theme:'Abundance & Engineering',outfit:'Purple',wake:'5:30am',
+   scripture:'"God blessed them and said, Be fruitful and increase in number." — Genesis 1:22',
+   why:'You build systems that multiply and fill the earth. Purple = royal CEO authority. Bible Study replaces evening Intellabooks — Saturday morning covers build time.',
+   tl:[
+    {t:'5:30am',n:'Wake · Gratitude · Meds · Face',g:['spirit']},
+    {t:'5:50am',n:'Yoga · Meditation · Wim Hof',g:['spirit','body']},
+    {t:'6:00am',n:'Weightlifting with Liz — 30 min',g:['body'],s:'5928 Curzon Ave'},
+    {t:'6:30am',n:'Post-lift shower at home — 30 min',g:['life'],s:'Shower before hair appointment'},
+    {t:'7:00am',n:'Drive to Drybar Riverside — 30 min',g:['life'],s:'5928 Curzon → 1653 River Run #161, FW 76107'},
+    {t:'7:30am',n:'Drybar Blowout — 1 hour',g:['life'],s:'Look like where you\'re going · Purple day'},
+    {t:'8:45am',n:'Head home or straight to workspace',g:['life']},
+    {t:'9:00am',n:'Deep Engineering Block — Intellabooks AI Agents + Workflow Builds',g:['biz'],s:'No Slack · no interruptions · focus only'},
+    {t:'11:00am',n:'Break fast — Cottage Cheese or Greek Yogurt',g:['body']},
+    {t:'12:30pm',n:'1:1 with Nick — 1 hour',g:['work']},
+    {t:'2:00pm',n:'Personal Finance · P&L Review · Tithe',g:['life'],s:'Govern your kingdom · Matthew 25:21'},
+    {t:'3:00pm',n:'Deep Clean: Bathroom · Cat Litter · Car Wash',g:['life']},
+    {t:'4:30pm',n:'Dog Walk',g:['spirit','body']},
+    {t:'6:00pm',n:'Bible Study — 2 hours',g:['spirit'],s:'This IS the evening work — spiritual refueling'},
+    {t:'8:00pm',n:'Lurasidone Medication Meal — Wagyu or shake',g:['body'],s:'350 cal minimum'},
+    {t:'8:30pm',n:'Wind-down · PJs',g:['life']},
+    {t:'9:15pm',n:'Lights out 🌙',g:['spirit']},
+   ]},
+  {key:'fri',abbr:'Fri',name:'The Day of Completion',color:'#888780',theme:'Harvest & People',outfit:'Black / Silver',wake:'5:45am',
+   scripture:'"So God created mankind in his own image... male and female he created them." — Genesis 1:27',
+   why:'Friday is about people — closing the week strong and networking with purpose. Black/Silver = polished, powerful, ready for the mission field.',
+   tl:[
+    {t:'5:45am',n:'Wake · Gratitude · Meds · Face',g:['spirit']},
+    {t:'6:00am',n:'Yoga · Meditation · Wim Hof · Bible Study',g:['spirit','body']},
+    {t:'7:15am',n:'WRKT Pilates',g:['body']},
+    {t:'8:30am',n:'Shower · Dress in Black or Silver',g:['life']},
+    {t:'11:00am',n:'Break fast — Cottage Cheese or Greek Yogurt + Omega-3',g:['body']},
+    {t:'11:30am',n:'1:1 — 30 min',g:['work']},
+    {t:'1:00pm',n:'MQL Funnel Score Sync',g:['work']},
+    {t:'2:00pm',n:'Wrap week · Prep Monday outreach list',g:['work']},
+    {t:'4:30pm',n:'Dog Walk · Sunset',g:['spirit','body']},
+    {t:'6:00pm',n:'Networking Mixer — Fort Worth or Dallas',g:['biz'],s:'Networking dress: blue, pink, white, or black'},
+    {t:'6:30pm',n:'Lurasidone Medication Meal',g:['body'],s:'350 cal — eat before or during event'},
+    {t:'9:30pm',n:'Lights out or grace night 🌙',g:['spirit']},
+   ]},
+  {key:'sat',abbr:'Sat',name:'The Day of Community',color:'#BA7517',theme:'Preparation & Stewardship',outfit:'Gold / Rainbow',wake:'7:30am',
+   scripture:'"The silver is mine and the gold is mine, declares the Lord Almighty." — Haggai 2:8',
+   why:'Ministry anchors the morning — you serve first, then you build. This is the order of the Kingdom. The Intellabooks block comes after you\'ve given away something that costs you nothing but your time.',
+   tl:[
+    {t:'7:30am',n:'Wake — rest day, sleep in',g:['spirit']},
+    {t:'8:30am',n:'Morning Liturgy — slower pace, no alarm pressure',g:['spirit']},
+    {t:'9:00am',n:'Drive to Cowtown Farmers Market — Clifford St, White Settlement',g:['spirit'],s:'TAFB FMNP Volunteer shift · 9:50am–12:05pm · wear close-toed shoes + sunscreen'},
+    {t:'9:50am',n:'TAFB Volunteer Shift — Farmers Market Nutrition Program',g:['spirit'],s:'Greet families · issue WIC vouchers · serve with excellence · supervisor: Manny Herrera'},
+    {t:'12:05pm',n:'Volunteer wraps · drive home',g:['life']},
+    {t:'12:30pm',n:'Break fast — Cottage Cheese or Yogurt · decompress',g:['body']},
+    {t:'1:00pm',n:'Intellabooks Build Block — 2.5 hours',g:['biz'],s:'Post at analyzed windows: IG 7:30–8:45am (Mon–Wed) · FB 11am–1:30pm · LinkedIn Tue 8:30am'},
+    {t:'3:30pm',n:'Personal time · Friends · Errands · car wash',g:['life']},
+    {t:'5:00pm',n:'Get ready — ribbed lounge set or networking dress',g:['life'],s:'Networking dress (blue/pink/white/black) if going out · ribbed set if staying in'},
+    {t:'6:30pm',n:'Lurasidone Medication Meal',g:['body'],s:'350 cal minimum'},
+    {t:'7:00pm',n:'Networking event / friends / discipleship',g:['biz','spirit']},
+    {t:'12:00am',n:'Lights out — midnight is the grace boundary 🌙',g:['spirit'],s:'2am allowed on special nights — use wisdom'},
+   ]},
+  {key:'sun',abbr:'Sun',name:'The Day of Holy Rest',color:'#F0997B',theme:'Sabbath & Celebration',outfit:'White / Gold',wake:'8:00am',
+   scripture:'"On the seventh day God rested from all his work." — Genesis 2:2',
+   why:'Rest is not a reward — it is the fuel. The Sunday Feast is prophetic. Cake lives here and nowhere else. Sabbath is obedience, not laziness.',
+   tl:[
+    {t:'8:00am',n:'Wake — Sabbath begins now',g:['spirit']},
+    {t:'9:00am',n:'Get ready · Dress in White or Gold',g:['life']},
+    {t:'9:30am',n:'Hulen Street Church Service',g:['spirit']},
+    {t:'11:00am',n:'Small Group',g:['spirit']},
+    {t:'1:00pm',n:'The Feast — Wagyu · Asparagus · Sunday Cake 🎂',g:['spirit','body'],s:'Controlled joy · this is where cake lives'},
+    {t:'2:00pm',n:'Digital Detox — no screens, no business, no Intellabooks',g:['spirit']},
+    {t:'2:30pm',n:'Read · Color · Nap · Be a child',g:['spirit']},
+    {t:'4:30pm',n:'Dog Walk · Walk with God',g:['spirit','body']},
+    {t:'6:30pm',n:'Lurasidone check — confirm 350 cal covered by Feast',g:['body']},
+    {t:'9:15pm',n:'Lights out — ready for Monday\'s Order 🌙',g:['spirit']},
+   ]},
+];
+
+const TG={spirit:'Spirit',body:'Body',work:'Work',biz:'Intellabooks',life:'Life'};
+const TC={spirit:'t-spirit',body:'t-body',work:'t-work',biz:'t-biz',life:'t-life'};
+
+const MORNING=[
+  {l:'Wake & speak gratitude aloud to God',m:'First words before touching the phone — always'},
+  {l:'Wash face · take Lurasidone if morning dose',m:'Consistent timing supports medication effectiveness'},
+  {l:'Brush hair · silk robe on',m:'Dress like the CEO you are, even at 4am'},
+  {l:'Yoga — 10 minutes',m:'Stewardship of the temple · 1 Corinthians 6:19'},
+  {l:'Meditation — 5 minutes',m:'Silence before the world speaks'},
+  {l:'Wim Hof Breathing — 5 minutes',m:'Oxygenate the brain before you lead'},
+  {l:'Bible Study & Prayer',m:'Feed the spirit first — the Word goes in before the noise'},
+  {l:'Dress in today\'s color',m:'Armor up — your color is your daily assignment'},
+];
+
+const WINDDOWN=[
+  {l:'Kitchen Reset — dishwasher loaded, counters wiped',m:'Lemon or lavender scent · sanctify the space'},
+  {l:'Lay out tomorrow\'s color-coded gym outfit',m:'Remove one decision from your 4:45am brain'},
+  {l:'Scoop cat litter',m:'5 minutes · life rhythm, not a chore'},
+  {l:'Prep dog leash for tomorrow\'s walk',m:'Small prep, massive peace of mind'},
+  {l:'Write Top 3 tasks for tomorrow',m:'Mental dump — stop the brain loop at midnight'},
+  {l:'Confirm Lurasidone meal was 350+ calories',m:'Non-negotiable — medication requires this to work'},
+  {l:'Skin care routine',m:'You are tending to God\'s creation'},
+  {l:'Kim K PJs on · phone face-down',m:'Sleep is an act of faith — trust Him with the night'},
+];
+
+const NUTRITION=[
+  {t:'11:00am',m:'Break fast',d:'1 cup low-fat cottage cheese OR 1 Greek yogurt\n+ ½ cup frozen berries · Omega-3 + D3 pill',p:['28g protein','~280 cal','your choice daily']},
+  {t:'2:30pm',m:'Builder Snack',d:'Greek yogurt OR apple + 1 tbsp natural peanut butter\nFlex based on 11am choice',p:['15g protein','~220 cal','fat + fiber']},
+  {t:'5:30pm',m:'Frozen Protein Shake',d:'1.5 scoops whey + frozen banana + 1 tbsp PB + water/ice\nBlend night before, freeze, eat like ice cream',p:['40g protein','~380 cal','counts as med meal']},
+  {t:'6:30pm',m:'Lurasidone Meal ★',d:'200g Wagyu flake steak + asparagus in olive oil\nOR frozen shake if appetite is low — both hit 350+ cal',p:['45–50g protein','350–400 cal','★ required']},
+];
+
+const GROCERY=[
+  {l:'Wagyu flake steak — 5–7 portions, 200g each',m:'Medication meal + Sunday feast'},
+  {l:'Cottage cheese — 2 tubs, low-fat',m:'Daily 11am break fast option'},
+  {l:'Greek yogurt — 5–6 cups',m:'Flexible daily swap · 15g protein each'},
+  {l:'Whey protein powder',m:'1.5 scoops per day'},
+  {l:'Asparagus — 3–4 bunches',m:'Iron + folate · pairs with steak'},
+  {l:'Bananas — 5–7 (freeze immediately)',m:'Frozen for shake each evening'},
+  {l:'Natural peanut butter — no sugar added',m:'Fats for shake + snack'},
+  {l:'Frozen mixed berries — large bag',m:'Break fast bowl'},
+  {l:'Olive oil',m:'Cooking steak + asparagus'},
+  {l:'Sunday Cake — 1 beautiful treat',m:'Controlled joy · Sundays only'},
+  {l:'Omega-3 + D3 pills',m:'Taken at 11am with break fast'},
+];
+
+const IB_TASKS=[
+  {week:'Week 1 — Foundation',meta:'Setup & Systems',tasks:[
+    {t:'Connect Meta Business Suite (Instagram + Facebook) to scheduling tool',g:'Setup'},
+    {t:'Connect LinkedIn to scheduling tool',g:'Setup'},
+    {t:'Upload and schedule 3 months of content — Saturday 4-hour block',g:'Content',s:'Post at your analyzed ideal times — do not override your own analysis'},
+    {t:'Verify booking link is live and confirm test booking flows through',g:'Testing'},
+    {t:'Build HVAC lead list on Apollo free tier — 20 Fort Worth targets',g:'Outreach'},
+    {t:'Send first 10 Founding Partner emails (Mon/Wed 6–8pm blocks)',g:'Outreach'},
+  ]},
+  {week:'Week 2 — Outreach',meta:'Calls + Cards + First Responses',tasks:[
+    {t:'Follow up by phone — 48 hours after each email sent',g:'Outreach'},
+    {t:'Order first batch of physical invitation cards via PostGrid',g:'Operations'},
+    {t:'Mail 5 handwritten Founding Partner cards to top HVAC prospects',g:'Outreach'},
+    {t:'Build Medspa lead list — 20 Fort Worth + Dallas targets on Apollo',g:'Outreach'},
+    {t:'Test Intellabooks AI voice agent — 3 sample inbound call flows',g:'Testing'},
+  ]},
+  {week:'Week 3 — Engineering',meta:'Workflows + Sequences + Assembly',tasks:[
+    {t:'Build SMS follow-up trigger sequence for HVAC leads',g:'Operations'},
+    {t:'Build email drip: Day 1 / Day 4 / Day 7 for non-openers',g:'Operations'},
+    {t:'Run full Trinity Reach-out test: Email → Call → Card on 1 live prospect',g:'Testing'},
+    {t:'Set up Assembly client management view for first client onboarding',g:'Operations',s:'Your white-glove client management layer'},
+    {t:'Draft non-profit outreach email — Tarrant Area Food Bank',g:'Ministry Biz'},
+  ]},
+  {week:'Week 4 — Convert & Report',meta:'First Demo · Month 2 Content',tasks:[
+    {t:'Pull social media analytics — document what performed, what flopped',g:'Content'},
+    {t:'Book first demo call with a warm lead',g:'Outreach'},
+    {t:'Build Client #1 onboarding checklist — what does their Week 1 look like?',g:'Operations'},
+    {t:'Saturday morning: schedule Month 2 content batch (4-hour block)',g:'Content'},
+    {t:'Refine Founding Partner email based on open + reply data',g:'Outreach'},
+  ]},
+];
+
+const MINISTRY=[
+  {w:'Week 1',t:'Blessing Bags',s:'10 bags in trunk always'},
+  {w:'Week 2',t:'Pay it Forward',s:'Coffee for the person behind you'},
+  {w:'Week 3',t:'Volunteer',s:'2 hrs at Tarrant Area Food Bank'},
+  {w:'Week 4',t:'Non-Profit Audit',s:'Free 30-min automation session'},
+];
+
+const BLESSING=[
+  {l:'Pair of socks',m:'Most needed item for unhoused individuals'},
+  {l:'Water bottle',m:'Practical and life-giving'},
+  {l:'$5 gift card — fast food or grocery',m:'Gives dignity and agency'},
+  {l:'High-protein granola bar',m:'Fuel, not empty carbs'},
+  {l:'Handwritten scripture of hope',m:'"Whoever is generous to the poor lends to the Lord." — Proverbs 19:17'},
+];
+
+const LOG_ITEMS={
+  mon:['Morning liturgy','WRKT Pilates','Intellabooks outreach','Medication meal'],
+  tue:['Morning liturgy','Pilates + weights','Therapy attended','Evening rest (no work)'],
+  wed:['Morning liturgy','WRKT Pilates','Intellabooks content','Medication meal'],
+  thu:['Morning liturgy','Weightlifting + Drybar','Deep engineering block','Bible Study'],
+  fri:['Morning liturgy','WRKT Pilates','Week wrapped','Medication meal'],
+  sat:['Intellabooks build block','Ministry / volunteer','Social content scheduled','Medication meal'],
+  sun:['Church + small group','Digital detox honored','Sunday feast','Dog walk with God'],
+};
+const LOG_KEYS=['mon','tue','wed','thu','fri','sat','sun'];
+const LOG_NAMES=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+// SCHEDULE
+function renderWeek(){
+  const grid=document.getElementById('week-grid');
+  const todayKey={1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat',0:'sun'}[new Date().getDay()];
+  grid.innerHTML=DAYS.map(d=>`
+    <div class="day-card ${d.key}${d.key===todayKey?' active':''}" onclick="showDay('${d.key}')">
+      <div class="day-dot" style="background:${d.color}"></div>
+      <div class="day-abbr">${d.abbr}</div>
+      <div class="day-name-c">${d.name.replace('The Day of ','')}</div>
+      <div class="day-theme">${d.theme.split('—')[0].trim()}</div>
+      <div class="day-wake">${d.wake}</div>
+    </div>`).join('');
+  if(todayKey) showDay(todayKey);
+}
+
+function showDay(key){
+  const d=DAYS.find(x=>x.key===key);if(!d)return;
+  document.querySelectorAll('.day-card').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.day-card.'+key).forEach(c=>c.classList.add('active'));
+  const det=document.getElementById('day-detail');
+  det.classList.add('visible');
+  const tg=tags=>tags.map(t=>`<span class="tl-tag ${TC[t]}">${TG[t]}</span>`).join('');
+  det.innerHTML=`
+    <div class="det-hdr">
+      <div class="det-bar" style="background:${d.color}"></div>
+      <div><div class="det-title">${d.name}</div><div class="det-sub">Outfit: ${d.outfit} · Wake: ${d.wake}</div></div>
+    </div>
+    <div class="scripture">${d.scripture}</div>
+    <p class="day-why">${d.why}</p>
+    <div>${d.tl.map(i=>`
+      <div class="tl-item">
+        <div class="tl-time">${i.t}</div>
+        <div><div class="tl-title">${i.n}${tg(i.g)}</div>${i.s?`<div class="tl-sub">${i.s}</div>`:''}</div>
+      </div>`).join('')}
+    </div>`;
+}
+
+// WEEKLY LOG
+let wkOffset=0;
+function getMondayOf(offset){
+  const n=new Date();
+  const day=n.getDay();
+  const diff=n.getDate()-day+(day===0?-6:1);
+  return new Date(n.setDate(diff+offset*7));
+}
+function getWeekDates(offset){
+  const mon=getMondayOf(offset);
+  return LOG_KEYS.map((_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d;});
+}
+function getWeekKey(offset){return getMondayOf(offset).toISOString().slice(0,10);}
+
+function changeWeek(dir){wkOffset+=dir;renderLog();}
+
+function renderLog(){
+  const wk=getWeekKey(wkOffset);
+  const dates=getWeekDates(wkOffset);
+  document.getElementById('wk-label').textContent=wkOffset===0?'This Week':wkOffset===-1?'Last Week':wkOffset===1?'Next Week':`Week of ${dates[0].toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+  document.getElementById('wk-range').textContent=`${dates[0].toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${dates[6].toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+  const saved=JSON.parse(localStorage.getItem('wl-'+wk)||'{}');
+  document.getElementById('log-grid').innerHTML=LOG_KEYS.map((dayKey,di)=>{
+    const items=LOG_ITEMS[dayKey]||[];
+    const d=dates[di];
+    return`<div class="log-day">
+      <div class="log-dname">${LOG_NAMES[di].slice(0,3)} ${d.getDate()}</div>
+      <div>${items.map((item,ii)=>{
+        const k=`${dayKey}-${ii}`,done=saved[k];
+        return`<div class="log-chk${done?' done':''}" onclick="toggleLog('${wk}','${k}',this)">
+          <div class="lc-box"><svg width="8" height="6" viewBox="0 0 8 6" fill="none" style="display:${done?'block':'none'}"><path d="M1 3L3 5L7 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <span class="lc-lbl">${item}</span>
+        </div>`;
+      }).join('')}</div>
+    </div>`;
+  }).join('');
+  // summary
+  let done=0,total=0,wo=0,ib=0;
+  LOG_KEYS.forEach(dk=>{(LOG_ITEMS[dk]||[]).forEach((item,ii)=>{
+    total++;const k=`${dk}-${ii}`;
+    if(saved[k]){done++;if(item.toLowerCase().includes('pilates')||item.toLowerCase().includes('weight'))wo++;if(item.toLowerCase().includes('intellabooks'))ib++;}
+  });});
+  document.getElementById('wk-summary').innerHTML=`
+    <div><span class="ws-num">${done}</span><span class="ws-lbl">Tasks Done</span></div>
+    <div><span class="ws-num">${wo}</span><span class="ws-lbl">Workouts</span></div>
+    <div><span class="ws-num">${ib}</span><span class="ws-lbl">IB Blocks</span></div>
+    <div><span class="ws-num">${total>0?Math.round(done/total*100):0}%</span><span class="ws-lbl">Completion</span></div>`;
+}
+
+function toggleLog(wk,k,row){
+  row.classList.toggle('done');
+  const svg=row.querySelector('svg');if(svg)svg.style.display=row.classList.contains('done')?'block':'none';
+  const saved=JSON.parse(localStorage.getItem('wl-'+wk)||'{}');
+  saved[k]=row.classList.contains('done');
+  localStorage.setItem('wl-'+wk,JSON.stringify(saved));
+  renderLog();
+}
+
+// CHECKLISTS
+function renderChecklist(id,items){
+  const el=document.getElementById(id);
+  const saved=JSON.parse(localStorage.getItem(id)||'[]');
+  el.innerHTML=items.map((item,i)=>`
+    <div class="chk-item${saved.includes(i)?' done':''}" onclick="toggleChk('${id}',${i},this)">
+      <div class="chk-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="chk-label">${item.l}${item.m?`<span class="chk-meta">${item.m}</span>`:''}</div>
+    </div>`).join('');
+}
+function toggleChk(id,idx,el){
+  el.classList.toggle('done');
+  const saved=JSON.parse(localStorage.getItem(id)||'[]');
+  const i=saved.indexOf(idx);if(i>-1)saved.splice(i,1);else saved.push(idx);
+  localStorage.setItem(id,JSON.stringify(saved));
+}
+
+// NUTRITION
+function renderNutrition(){
+  document.getElementById('nut-grid').innerHTML=NUTRITION.map(n=>`
+    <div class="nut-item">
+      <div class="nut-time">${n.t}</div>
+      <div class="nut-meal">${n.m}</div>
+      <div class="nut-detail">${n.d.replace(/\n/g,'<br>')}</div>
+      <div class="nut-macros">${n.p.map(x=>`<span class="macro">${x}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+// IB TASKS
+function renderIB(){
+  const saved=JSON.parse(localStorage.getItem('ib')||'{}');
+  document.getElementById('ib-tasks').innerHTML=IB_TASKS.map((block,bi)=>`
+    <div class="wk-block">
+      <div class="wk-block-hdr" onclick="toggleBlk(${bi})">
+        <div><div class="wk-block-title">${block.week}</div><div class="wk-block-meta">${block.meta}</div></div>
+        <div style="font-size:12px;color:var(--muted)" id="bc${bi}"></div>
+      </div>
+      <div class="wk-block-body${bi===0?' open':''}" id="bb${bi}">
+        ${block.tasks.map((t,ti)=>{const k=`${bi}-${ti}`,done=saved[k];return`
+          <div class="task-row${done?' done':''}" onclick="toggleTask(${bi},${ti},this)">
+            <div class="task-chk"><svg width="8" height="6" viewBox="0 0 8 6" fill="none" style="display:${done?'block':'none'}"><path d="M1 3L3 5L7 1" stroke="#011f38" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><div class="task-txt">${t.t}</div>${t.s?`<div class="task-tag" style="font-style:italic">${t.s}</div>`:''}<div class="task-tag">${t.g}</div></div>
+          </div>`;}).join('')}
+      </div>
+    </div>`).join('');
+  IB_TASKS.forEach((_,bi)=>updateBC(bi));
+}
+function toggleBlk(bi){document.getElementById('bb'+bi).classList.toggle('open');}
+function toggleTask(bi,ti,row){
+  row.classList.toggle('done');
+  const svg=row.querySelector('svg');if(svg)svg.style.display=row.classList.contains('done')?'block':'none';
+  const saved=JSON.parse(localStorage.getItem('ib')||'{}');
+  saved[`${bi}-${ti}`]=row.classList.contains('done');
+  localStorage.setItem('ib',JSON.stringify(saved));
+  updateBC(bi);
+}
+function updateBC(bi){
+  const saved=JSON.parse(localStorage.getItem('ib')||'{}');
+  const total=IB_TASKS[bi].tasks.length;
+  const done=IB_TASKS[bi].tasks.filter((_,ti)=>saved[`${bi}-${ti}`]).length;
+  const el=document.getElementById('bc'+bi);if(el)el.textContent=`${done}/${total}`;
+}
+
+// MINISTRY
+function renderMinistry(){
+  const saved=JSON.parse(localStorage.getItem('ministry')||'[]');
+  document.getElementById('min-grid').innerHTML=MINISTRY.map((m,i)=>`
+    <div class="min-card${saved.includes(i)?' done':''}" onclick="toggleMin(${i},this)">
+      <div class="min-wk">${m.w}</div>
+      <div class="min-title">${m.t}</div>
+      <div class="min-sub">${m.s}</div>
+      <div class="min-done">✓ Complete</div>
+    </div>`).join('');
+}
+function toggleMin(i,el){
+  el.classList.toggle('done');
+  const saved=JSON.parse(localStorage.getItem('ministry')||'[]');
+  const idx=saved.indexOf(i);if(idx>-1)saved.splice(idx,1);else saved.push(i);
+  localStorage.setItem('ministry',JSON.stringify(saved));
+}
+
+// COUNTDOWN
+function updateCD(){
+  const goal=new Date('2026-08-25T00:00:00');
+  const start=new Date('2026-04-14T00:00:00');
+  const now=new Date();
+  const diff=goal-now;
+  if(diff<=0){['cd-w','cd-d','cd-h','cd-m'].forEach(id=>document.getElementById(id).textContent='0');return;}
+  document.getElementById('cd-w').textContent=Math.floor(diff/(1000*60*60*24*7));
+  document.getElementById('cd-d').textContent=Math.floor((diff%(1000*60*60*24*7))/(1000*60*60*24));
+  document.getElementById('cd-h').textContent=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+  document.getElementById('cd-m').textContent=Math.floor((diff%(1000*60*60))/(1000*60));
+  const pct=Math.min(100,Math.max(0,((now-start)/(goal-start))*100));
+  document.getElementById('prog-fill').style.width=pct.toFixed(1)+'%';
+}
+
+function updateDT(){
+  const now=new Date();
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cur-date').textContent=`${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+  document.getElementById('cur-day').textContent=days[now.getDay()];
+  document.getElementById('cur-time').textContent=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='tracker') renderLog();
+  if(name==='prayer') renderPrayer();
+}
+
+// MORNING STEPS (detailed with why)
+const MORNING_STEPS=[
+  {step:1,time:'First breath',title:'Wake & speak gratitude',why:'Your first words train your brain\'s default. Gratitude before your feet hit the floor rewires the amygdala away from cortisol and toward possibility. This is not spiritual performance — it is neuroscience and obedience at the same time.',action:'Say out loud: "Thank You for waking me. I am alive. That is enough."',tag:'spirit'},
+  {step:2,time:'+2 min',title:'Wash your face · take Lurasidone',why:'Cold water on your face triggers the vagus nerve and drops your cortisol faster than caffeine. Lurasidone must be paired with food — even a small cracker is fine if you take it now, but your real meal comes at 11am.',action:'Splash cold water · pat dry · medication with small snack if needed',tag:'body'},
+  {step:3,time:'+5 min',title:'Lotion · brush hair · silk robe on',why:'You are about to talk to God and then go move your body. You do not need to earn beauty — but when you tend to yourself first, you signal to your nervous system that you are safe, cared for, and not in survival mode. Leaders who feel tended to lead better.',action:'Lotion on arms + legs · brush hair · wrap yourself in the robe',tag:'life'},
+  {step:4,time:'+10 min',title:'Yoga — 10 minutes',why:'Your lymphatic system has no pump — it moves only when you move. Ten minutes of intentional stretching after sleep flushes the cellular waste that accumulated overnight. You are literally cleaning your body from the inside. Scripture calls this stewardship.',action:'Mat down · gentle flow · no performance · just move',tag:'body'},
+  {step:5,time:'+20 min',title:'Meditation — 5 minutes',why:'The gap between stimulus and response is where your character lives. Meditation trains that gap wider. Five minutes of silence before the world speaks means you lead your day — your day does not lead you.',action:'Sit still · breathe · when your mind wanders, return without judgment',tag:'spirit'},
+  {step:6,time:'+25 min',title:'Wim Hof Breathing — 5 minutes',why:'Thirty deep breaths followed by a breath hold floods your blood with oxygen and temporarily raises your body\'s pH. This triggers a mild stress-inoculation response — you become measurably calmer under pressure for hours after. This is why high performers swear by it.',action:'30 deep breaths in/out · exhale hold · recovery breath · repeat 3 rounds',tag:'body'},
+  {step:7,time:'+30 min',title:'Bible Study & Prayer',why:'You are building a trillion-dollar business. The decisions you make will affect employees, clients, families. You cannot lead at that level on your own wisdom alone. The Word is not devotional decoration — it is strategic intelligence from the One who sees what you cannot.',action:'Read · sit with it · write one thing God is saying to you today',tag:'spirit'},
+  {step:8,time:'+45 min',title:'Dress in today\'s color',why:'Color is a pre-commitment device. When you put on Blue, your brain begins organizing Monday-mode thoughts. When you put on Purple, you shift into governance and engineering. You are not just getting dressed — you are installing the operating system for the day.',action:'Gym days: gym set in the day\'s color · dress for the assignment',tag:'life'},
+];
+
+const EVENING_STEPS=[
+  {step:1,time:'8:15pm',title:'Kitchen Reset — dishes + counters',why:'A clean kitchen in the morning is one of the single highest-impact things you can do for your mental health. Waking up to disorder before 5am trains your subconscious that the world is chaotic. Waking up to order trains it that you are in control.',action:'Load dishwasher · run it · wipe counters with lemon spray · done in 8 min',tag:'life'},
+  {step:2,time:'8:23pm',title:'Scoop cat litter',why:'This is not a chore. This is stewardship. You are responsible for a living creature who cannot tend to itself. Five minutes of faithfulness in small things builds the spiritual posture of faithfulness in large ones.',action:'Scoop · dispose · fresh litter if needed · wash hands',tag:'life'},
+  {step:3,time:'8:28pm',title:'Quick bathroom wipe-down',why:'Not a deep clean — just a reset. Sink, mirror, toilet seat. On Thursdays you deep clean. Every other night this takes three minutes and prevents the need to ever have a "disaster bathroom" moment.',action:'Clorox wipe on sink + faucet · mirror spray · 3 minutes max',tag:'life'},
+  {step:4,time:'8:31pm',title:'Make tomorrow\'s bed side ready',why:'Pulling back your covers, fluffing your pillow, and placing your water bottle by the bed is an act of care toward your future self. You are telling tomorrow-Alicia: I thought of you. She will feel it.',action:'Water bottle filled · phone charger in place · PJs laid out',tag:'life'},
+  {step:5,time:'8:35pm',title:'Lay out tomorrow\'s gym outfit',why:'Decision fatigue is real. At 4:45am, your prefrontal cortex — the part that makes good decisions — is not fully online. Removing even one choice (what do I wear?) protects your best thinking for the boardroom, not the closet.',action:'Tomorrow\'s color-coded gym set on the chair · shoes next to it',tag:'life'},
+  {step:6,time:'8:38pm',title:'Write Top 3 for tomorrow',why:'Your brain will loop on unfinished tasks all night if you don\'t externalize them. This is called the Zeigarnik Effect. Three lines in a notes app or journal closes the loop so your nervous system can actually rest.',action:'Write 3 things only · not a full list · just the three that matter most',tag:'spirit'},
+  {step:7,time:'8:42pm',title:'Confirm Lurasidone meal was 350+ cal',why:'Lurasidone\'s bioavailability drops by 50% when taken without adequate food. This is not optional. If you skipped the steak, have the shake now. This is the most important logistical item on the list.',action:'Did you eat 350+ cal? Yes → continue. No → eat something now.',tag:'body'},
+  {step:8,time:'8:45pm',title:'Skin care routine',why:'Your skin repairs itself during sleep — the hours between 10pm and 2am are peak cellular regeneration time. Products applied now absorb differently than during the day. You are not just moisturizing — you are working with your body\'s natural intelligence.',action:'Cleanse · tone if you use it · moisturize · eye cream · you are done',tag:'body'},
+  {step:9,time:'8:55pm',title:'Kim K PJs on · phone face-down',why:'Blue light from your phone suppresses melatonin for up to 90 minutes after exposure. Face-down is not about willpower — it is about removing the trigger. When the phone is face-up, you will look at it. When it is face-down, you often forget it exists.',action:'PJs on · phone face-down across the room or in another room · lights low',tag:'spirit'},
+  {step:10,time:'9:05pm',title:'Speak your closing prayer',why:'End where you began — with God. The bookend prayer is the spiritual signal that this day is complete. You are not responsible for tomorrow yet. You did your part. Now you rest in His.',action:'Thank Him for the day · release what\'s unfinished · trust Him with the night',tag:'spirit'},
+];
+
+function renderSteps(containerId, steps){
+  const el=document.getElementById(containerId);if(!el)return;
+  const saved=JSON.parse(localStorage.getItem(containerId)||'[]');
+  el.innerHTML=steps.map((s,i)=>`
+    <div style="display:flex;gap:16px;padding:16px 0;border-bottom:0.5px solid var(--border);cursor:pointer;${saved.includes(i)?'opacity:0.45':''}" onclick="toggleStep('${containerId}',${i},this)">
+      <div style="flex-shrink:0;text-align:center;width:36px">
+        <div style="width:28px;height:28px;border-radius:50%;border:1.5px solid ${saved.includes(i)?'var(--pink)':'rgba(255,133,162,0.3)'};background:${saved.includes(i)?'var(--pink)':'transparent'};display:flex;align-items:center;justify-content:center;margin:0 auto 4px;transition:background .15s">
+          ${saved.includes(i)?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>':'<span style="font-size:11px;color:var(--muted)">${s.step}</span>'}
+        </div>
+        <div style="font-size:9px;color:var(--cyan);letter-spacing:0.5px">${s.time}</div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:400;color:var(--blush);margin-bottom:6px${saved.includes(i)?';text-decoration:line-through':''}">${s.title}
+          <span style="display:inline-block;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:middle;${s.tag==='spirit'?'background:rgba(195,165,236,0.2);color:var(--orchid)':s.tag==='body'?'background:rgba(0,217,255,0.1);color:var(--cyan)':'background:rgba(255,255,255,0.06);color:var(--muted)'}">${s.tag}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:8px">${s.why}</div>
+        <div style="font-size:12px;color:var(--text);background:rgba(255,133,162,0.05);border:0.5px solid rgba(255,133,162,0.12);border-radius:8px;padding:8px 12px;line-height:1.5">${s.action}</div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleStep(id,idx,row){
+  const saved=JSON.parse(localStorage.getItem(id)||'[]');
+  const i=saved.indexOf(idx);if(i>-1)saved.splice(i,1);else saved.push(idx);
+  localStorage.setItem(id,JSON.stringify(saved));
+  renderSteps(id,id==='morning-steps'?MORNING_STEPS:EVENING_STEPS);
+}
+
+// PRAYER OF THE WEEK
+const PRAYERS=[
+  {
+    week:'Week of Identity',
+    verse:'"Before I formed you in the womb I knew you; before you were born I set you apart." — Jeremiah 1:5',
+    theme:'You were not an accident of ambition. You were an assignment of Heaven. This week is about understanding that your identity is not your productivity, your title at ActiveCampaign, your client count, or your weight. It is the fact that God knew your name before your parents did.',
+    study:'Read Psalm 139:1–18. Read it slowly. Read it twice.',
+    questions:[
+      'What do I believe about myself that God would disagree with?',
+      'When I imagine standing before God, what do I expect Him to say to me — and is that based on truth or fear?',
+      'What part of my identity am I still trying to earn through performance?',
+      'What would I do differently this week if I truly believed I was already enough?',
+    ],
+    prayer:'Lord, I confess I have built my worth on things that shift — my output, my body, my plans. Teach me to rest in the identity You gave me before I did a single thing to deserve it. I am Yours. That is enough. Amen.',
+  },
+  {
+    week:'Week of Vision',
+    verse:'"Write the vision; make it plain on tablets, so he may run who reads it." — Habakkuk 2:2',
+    theme:'Intellabooks is not just a business. It is a vision. God told Habakkuk to write it down — not because God needed reminding, but because YOU need reminding. The clearer the vision, the more your daily decisions align with it. This week is about clarity.',
+    study:'Read Habakkuk 2:1–4 and Proverbs 29:18. Then read your Intellabooks mission statement out loud.',
+    questions:[
+      'What is Intellabooks ultimately FOR — beyond revenue? Who does it serve at its highest form?',
+      'If I had 7 clients by December, what would feel different about my day-to-day life?',
+      'What fear is currently blurring my vision for this business?',
+      'What one decision this week would honor the vision, even if it is uncomfortable?',
+    ],
+    prayer:'Lord, give me eyes to see what You see. The vision You placed in me is not mine to protect — it is mine to steward. Show me who needs what I am building. Send me to them. I will run when I see clearly. Help me see. Amen.',
+  },
+  {
+    week:'Week of Rest',
+    verse:'"Come to me, all you who are weary and burdened, and I will give you rest." — Matthew 11:28',
+    theme:'You are building something significant. You are also working a full-time job, training your body, serving your community, and tending to your spirit. The enemy of great work is not laziness — it is exhaustion disguised as productivity. This week is about learning to receive rest as a gift, not earn it as a reward.',
+    study:'Read Matthew 11:28–30 and Psalm 23. Notice the imagery of still water and green pastures. God leads you TO rest. He does not wait for you to arrive there on your own.',
+    questions:[
+      'Where in my schedule am I running on empty and calling it discipline?',
+      'What would it look like to truly stop on Sunday — and what fear comes up when I imagine it?',
+      'Am I resting my body but not my mind? What does real mental rest feel like for me?',
+      'What is one thing I can release this week — hand it to God and not pick it back up?',
+    ],
+    prayer:'Lord, I lay down the weight of doing. I do not have to prove my worth this week through output. Teach me to receive what You freely give. Lead me to still water. I will follow. Amen.',
+  },
+  {
+    week:'Week of Faithfulness',
+    verse:'"His master said to him, Well done, good and faithful servant. You have been faithful over a little; I will set you over much." — Matthew 25:23',
+    theme:'The path to "set over much" runs through "faithful over a little." The cat litter. The morning liturgy. The 10 emails per week. The medication meal. God is not watching for the moment you close your seventh client. He is watching you at 4:45am when no one else is. This week is about the small things.',
+    study:'Read Matthew 25:14–30 (the Parable of the Talents). Notice the servants who were rewarded were not the ones who got the most — they were the ones who did something with what they had.',
+    questions:[
+      'What "little thing" in my life am I treating as insignificant that God might consider a test of character?',
+      'Where have I been waiting for a bigger opportunity instead of being faithful with the current one?',
+      'What does faithfulness look like for me this week — specifically, concretely, measurably?',
+      'If God promoted me tomorrow, what habit or character quality would He point to as the reason?',
+    ],
+    prayer:'Lord, make me faithful in the small things. The emails, the mornings, the meals, the rest. I do not want to leap over the ordinary to reach the extraordinary — I want to find You in the ordinary and let it become extraordinary. Amen.',
+  },
+];
+
+function renderPrayer(){
+  const el=document.getElementById('prayer-content');if(!el)return;
+  const weekNum=Math.floor((new Date()-new Date('2026-04-14'))/(1000*60*60*24*7));
+  const p=PRAYERS[weekNum%PRAYERS.length];
+  const savedA=JSON.parse(localStorage.getItem('prayer-answers')||'{}');
+  const weekKey=`week-${weekNum}`;
+
+  el.innerHTML=`
+    <div style="background:rgba(195,165,236,0.06);border:0.5px solid rgba(195,165,236,0.2);border-radius:16px;padding:24px;margin-bottom:20px">
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orchid);margin-bottom:12px">${p.week}</div>
+      <div style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--orchid);line-height:1.7;margin-bottom:14px">${p.verse}</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.8">${p.theme}</p>
+    </div>
+
+    <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px">📖 This Week\'s Study</div>
+      <p style="font-size:13px;color:var(--text);line-height:1.7">${p.study}</p>
+    </div>
+
+    <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--pink);margin-bottom:14px">Questions to Ask Yourself</div>
+      ${p.questions.map((q,qi)=>`
+        <div style="margin-bottom:16px">
+          <div style="font-size:13px;color:var(--blush);margin-bottom:6px;font-weight:400">${qi+1}. ${q}</div>
+          <textarea placeholder="Write your response here..." style="width:100%;background:rgba(255,255,255,0.03);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--sans);font-size:12px;line-height:1.6;resize:vertical;min-height:60px;outline:none" onchange="savePrayerAnswer('${weekKey}',${qi},this.value)">${savedA[weekKey]?.[qi]||''}</textarea>
+        </div>`).join('')}
+    </div>
+
+    <div style="background:rgba(195,165,236,0.06);border-left:3px solid var(--orchid);border-radius:0 12px 12px 0;padding:20px;margin-bottom:20px">
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orchid);margin-bottom:10px">This Week\'s Prayer</div>
+      <p style="font-family:var(--serif);font-style:italic;font-size:15px;color:var(--orchid);line-height:1.8">${p.prayer}</p>
+    </div>
+
+    <div style="text-align:center;font-size:11px;color:var(--muted)">Prayer rotates weekly · 4 studies total · returns to Week 1 after completion</div>
+  `;
+}
+
+function savePrayerAnswer(weekKey,qi,val){
+  const saved=JSON.parse(localStorage.getItem('prayer-answers')||'{}');
+  if(!saved[weekKey])saved[weekKey]={};
+  saved[weekKey][qi]=val;
+  localStorage.setItem('prayer-answers',JSON.stringify(saved));
+}
+
+// MISSION & VISION
+function renderMission(){
+  const el=document.getElementById('mission-content');if(!el)return;
+  el.innerHTML=`
+    <div style="text-align:center;padding:20px 0 32px">
+      <div style="font-family:var(--serif);font-size:clamp(11px,2vw,13px);letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">The Declaration</div>
+      <h1 style="font-family:var(--serif);font-size:clamp(32px,7vw,64px);font-weight:300;font-style:italic;color:var(--blush);line-height:1.1;margin-bottom:8px">I am not building a business.</h1>
+      <h1 style="font-family:var(--serif);font-size:clamp(32px,7vw,64px);font-weight:300;font-style:italic;color:var(--pink);line-height:1.1;margin-bottom:32px">I am building a testimony.</h1>
+      <p style="font-size:14px;color:var(--muted);max-width:540px;margin:0 auto;line-height:1.9">Intellabooks exists to give people their time back — so they can spend it on what God actually called them to do. Every system I build, every client I serve, every neighborhood I invest in is proof that when you surrender your gifts to God, He multiplies them beyond what any spreadsheet could project.</p>
+    </div>
+
+    <div style="position:relative;overflow:hidden;background:rgba(255,133,162,0.04);border:0.5px solid rgba(255,133,162,0.12);border-radius:20px;padding:36px 32px;margin-bottom:20px">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--pink),var(--orchid),transparent)"></div>
+      <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--pink);margin-bottom:20px">Why I Wake Up at 4:45am</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+        ${[
+          {icon:'✦',title:'For the HVAC owner',body:'Who missed his son\'s game because he was answering calls at 9pm. I give him an always-on teammate so he never chooses again.'},
+          {icon:'✦',title:'For the medspa founder',body:'Who built something beautiful but can\'t scale it because she is the system. I become the system so she can become the leader.'},
+          {icon:'✦',title:'For the woman watching this',body:'Who sees my schedule, my colors, my discipline and asks "how?" — and I get to say: Jesus first, systems second, everything else follows.'},
+          {icon:'✦',title:'For 76123',body:'The zip code I am going to redeem. Property by property. Restaurant by restaurant. Until the neighborhood itself is proof of what God does when you trust Him with a vision.'},
+        ].map(c=>`
+          <div style="background:rgba(255,255,255,0.03);border:0.5px solid var(--border);border-radius:12px;padding:18px">
+            <div style="color:var(--pink);margin-bottom:8px;font-size:16px">${c.icon}</div>
+            <div style="font-family:var(--serif);font-size:16px;color:var(--blush);margin-bottom:6px">${c.title}</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.7">${c.body}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="background:rgba(195,165,236,0.06);border:0.5px solid rgba(195,165,236,0.2);border-radius:16px;padding:28px;margin-bottom:20px;position:relative">
+      <div style="position:absolute;top:14px;left:22px;font-family:var(--serif);font-size:60px;color:rgba(195,165,236,0.12);line-height:1">"</div>
+      <p style="font-family:var(--serif);font-size:clamp(16px,2.5vw,20px);font-style:italic;color:var(--orchid);line-height:1.8;text-align:center;position:relative;z-index:1">I am not trying to pass Steve Jobs.<br>I am trying to build what Steve Jobs would have built<br>if he had met Jesus first.</p>
+      <p style="text-align:center;margin-top:12px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(195,165,236,0.4)">Alicia Martin · Founder, Intellabooks · 2026</p>
+    </div>
+
+    <div style="background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+      <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:20px">The Alicia Method — The Template I Will Hand You</div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        ${[
+          {num:'01',title:'Surrender the outcome first',body:'Every morning before the yoga mat, before the app, before the email — I talk to God. Not to ask for help with the plan. To ask if the plan is His. That question changes everything.'},
+          {num:'02',title:'Remove every unnecessary decision',body:'Colors by day. Outfits pre-planned. Meals scheduled. Gym times locked. Not because I am rigid — because when the small decisions are made, all my creativity goes to the things that actually matter.'},
+          {num:'03',title:'Build systems that give people time, not take it',body:'Intellabooks does not automate your business. It restores your life. Every workflow I build for a client is a gift of hours back to them. That is the product.'},
+          {num:'04',title:'Invest in community, not just in yourself',body:'76123 is not a real estate play. It is a covenant. I want the people in that zip code to eat better, live more beautifully, and know that someone bet on their neighborhood because God told her to.'},
+          {num:'05',title:'Let the testimony be the marketing',body:'When you ask me how I did it, I will not give you a pitch deck. I will show you this dashboard. I will show you the prayer tab. I will show you that the system only works because the Spirit runs through it.'},
+        ].map(s=>`
+          <div style="display:grid;grid-template-columns:44px 1fr;gap:16px;padding:16px 0;border-bottom:0.5px solid var(--border)">
+            <div style="font-family:var(--serif);font-size:28px;font-weight:300;color:rgba(255,133,162,0.25);padding-top:2px">${s.num}</div>
+            <div>
+              <div style="font-size:14px;font-weight:400;color:var(--blush);margin-bottom:4px">${s.title}</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.7">${s.body}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:16px 0;font-family:var(--serif);font-style:italic;font-size:14px;color:var(--muted)">"A city on a hill cannot be hidden." — Matthew 5:14</div>
+  `;
+}
+
+function renderVision(){
+  const el=document.getElementById('vision-content');if(!el)return;
+
+  const MILESTONES=[
+    {phase:'Phase 1',label:'The Foundation',target:'7 clients · $16,800/mo',by:'Dec 2026',color:'var(--pink)',items:['Prove the Trinity Reach-out system works','Build Intellabooks SOPs from scratch','First client onboarded with Assembly','First non-profit automation gifted']},
+    {phase:'Phase 2',label:'The Scale',target:'50 clients · $120,000/mo',by:'Dec 2027',color:'var(--orchid)',items:['Hire first Intellabooks team member','Reseller program fully active','Intellaproperties LLC formed','First property acquired in 76123']},
+    {phase:'Phase 3',label:'The Kingdom',target:'500 clients · $1.2M/mo',by:'Dec 2028',color:'var(--cyan)',items:['Intellabooks white-label launched for agencies','First Intellatown restaurant open','Non-profit food truck operational','Speaking at first national conference']},
+    {phase:'Phase 4',label:'The Mission',target:'1,500 clients · $43M/yr',by:'2030',color:'#ffc800',items:['76123 fully invested — Intellatown realized','Intellaproperties managing 20+ properties','Intellabooks Foundation established','Template handed to 1,000 women worldwide']},
+  ];
+
+  const INTELLATOWN=[
+    {name:'Intellaproperties',icon:'🏘',desc:'Buy every property in 76123. Improve the neighborhood through investment, not extraction. Each property improves the value of the next.'},
+    {name:'Intella Restaurants',icon:'🍽',desc:'Invest in chefs to open beautiful restaurants and stores in the neighborhood. Take them at a loss if needed — the property value gain is the return.'},
+    {name:'Intella Foundation',icon:'🤝',desc:'A non-profit we fund and operate. The food truck runs one day per month — we pay for a full day of unlimited food and give it all away free.'},
+    {name:'Intellatown',icon:'🌆',desc:'76123 becomes the proof of concept. A zip code redeemed by Kingdom economics. A city on a hill that cannot be hidden.'},
+  ];
+
+  const MONEY=[
+    {stage:'$16,800/mo',action:'Pay yourself first. Set aside 10% tithe immediately. Build 6-month emergency reserve. No lifestyle inflation yet.'},
+    {stage:'$120k/mo',action:'Form Intellaproperties LLC. Begin acquiring 76123 properties. Hire accountant who understands real estate + business wrapping.'},
+    {stage:'$1.2M/mo',action:'Structure businesses as a holding company. Wrap acquired small businesses in Intellabooks. Sell or keep based on strategic value.'},
+    {stage:'$43M/yr',action:'Family office structure. Intellaproperties as a REIT-adjacent vehicle. Foundation with dedicated giving budget. Generational wealth architecture.'},
+  ];
+
+  el.innerHTML=`
+    <div style="text-align:center;padding:16px 0 28px">
+      <div style="font-family:var(--serif);font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">The Long Game</div>
+      <h2 style="font-family:var(--serif);font-size:clamp(24px,5vw,44px);font-weight:300;font-style:italic;color:var(--blush);line-height:1.2">43 Million.<br><span style="color:var(--pink)">1,500 Clients.<br>One Zip Code Redeemed.</span></h2>
+    </div>
+
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Growth Milestones</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${MILESTONES.map(m=>`
+          <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:20px;border-left:3px solid ${m.color}">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+              <div>
+                <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:${m.color}">${m.phase} · ${m.label}</span>
+                <div style="font-family:var(--serif);font-size:18px;color:var(--blush);margin-top:2px">${m.target}</div>
+              </div>
+              <div style="font-size:12px;color:var(--muted);border:0.5px solid var(--border);padding:4px 12px;border-radius:20px">by ${m.by}</div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              ${m.items.map(i=>`<span style="font-size:11px;color:var(--muted);background:rgba(255,255,255,0.04);border:0.5px solid var(--border);padding:3px 10px;border-radius:10px">${i}</span>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Intellatown — 76123</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+        ${INTELLATOWN.map(t=>`
+          <div style="background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:18px;text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">${t.icon}</div>
+            <div style="font-family:var(--serif);font-size:15px;color:var(--blush);margin-bottom:6px">${t.name}</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.7">${t.desc}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px">How We Structure the Money — By Stage</div>
+      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:14px;overflow:hidden">
+        ${MONEY.map((m,i)=>`
+          <div style="display:grid;grid-template-columns:140px 1fr;gap:0;border-bottom:${i<MONEY.length-1?'0.5px solid var(--border)':'none'}">
+            <div style="padding:16px;background:rgba(255,133,162,0.04);border-right:0.5px solid var(--border)">
+              <div style="font-family:var(--serif);font-size:15px;color:var(--pink)">${m.stage}</div>
+            </div>
+            <div style="padding:16px;font-size:12px;color:var(--muted);line-height:1.7">${m.action}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="background:rgba(195,165,236,0.06);border:0.5px solid rgba(195,165,236,0.2);border-radius:16px;padding:24px;text-align:center">
+      <p style="font-family:var(--serif);font-style:italic;font-size:16px;color:var(--orchid);line-height:1.8">"The earth is the Lord's, and everything in it. The world, and all who live in it."</p>
+      <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(195,165,236,0.4);margin-top:8px">Psalm 24:1 · You are a steward of something much larger than a business</p>
+    </div>
+  `;
+}
+
+
+renderMission();
+renderVision();
+renderWeek();
+renderSteps('morning-steps',MORNING_STEPS);
+renderSteps('evening-steps',EVENING_STEPS);
+renderChecklist('grocery-list',GROCERY);
+renderNutrition();
+renderIB();
+renderMinistry();
+renderChecklist('blessing-list',BLESSING);
+updateCD();updateDT();
+setInterval(updateCD,30000);setInterval(updateDT,30000);
+</script>
+</body>
+</html>
